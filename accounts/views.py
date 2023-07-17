@@ -7,6 +7,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from .decorators import unauthorized_user
 
 
 # Create your views here.
@@ -46,7 +47,7 @@ def logoutUser(request):
     logout(request)
     return redirect('login')
 
-@login_required(login_url='login')
+@unauthorized_user
 def home(request):
     customers=Customer.objects.all()
     orders = Order.objects.all()
@@ -60,12 +61,12 @@ def home(request):
 
     return render(request,'accounts/dashboard.html',context)
 
-@login_required(login_url='login')
+@unauthorized_user
 def products(request):
    products = Product.objects.all()
    return render(request,'accounts/products.html',{'products':products})
 
-@login_required(login_url='login')
+@unauthorized_user
 def customer(request,pk_test):
     customers = Customer.objects.get(id=pk_test)
 
@@ -78,7 +79,7 @@ def customer(request,pk_test):
     context={'customers':customers,'orders':orders,'orders_count':orders_count,"filter":filter}
     return render(request,'accounts/customer.html',context)
 
-@login_required(login_url='login')
+@unauthorized_user
 def createOrder(request,pk):
     customer = Customer.objects.get(id=pk)
     form = OrderForm(initial={'customer':customer})
@@ -90,7 +91,7 @@ def createOrder(request,pk):
     context={'form':form}
     return render(request,'accounts/order_form.html',context)
 
-@login_required(login_url='login')
+@unauthorized_user
 def updateOrder(request,pk):
     order = Order.objects.get(id=pk)
     form = OrderForm(instance = order)
@@ -102,7 +103,7 @@ def updateOrder(request,pk):
     context ={'form':form}
     return render(request,'accounts/order_form.html',context)
 
-@login_required(login_url='login')
+@unauthorized_user
 def deleteOrder(request,pk):
     item = Order.objects.get(id=pk)
     if request.method =='POST':
