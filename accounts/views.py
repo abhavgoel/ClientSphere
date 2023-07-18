@@ -24,6 +24,9 @@ def registerPage(request):
             username=form.cleaned_data.get('username')
             group =Group.objects.get(name='customer')
             user.groups.add(group)
+            Customer.objects.create(
+                user=user,
+            )
             messages.success(request,"Account was created for " + username)
             return redirect('login')
     context={'form':form}
@@ -65,11 +68,13 @@ def home(request):
     return render(request,'accounts/dashboard.html',context)
 
 @login_required(login_url='login') 
+@allowed_users(allowed_roles=['admin'])
 def products(request):
    products = Product.objects.all()
    return render(request,'accounts/products.html',{'products':products})
 
 @login_required(login_url='login') 
+@allowed_users(allowed_roles=['admin'])
 def customer(request,pk_test):
     customers = Customer.objects.get(id=pk_test)
 
@@ -83,6 +88,7 @@ def customer(request,pk_test):
     return render(request,'accounts/customer.html',context)
 
 @login_required(login_url='login') 
+@allowed_users(allowed_roles=['admin'])
 def createOrder(request,pk):
     customer = Customer.objects.get(id=pk)
     form = OrderForm(initial={'customer':customer})
@@ -95,6 +101,7 @@ def createOrder(request,pk):
     return render(request,'accounts/order_form.html',context)
 
 @login_required(login_url='login') 
+@allowed_users(allowed_roles=['admin'])
 def updateOrder(request,pk):
     order = Order.objects.get(id=pk)
     form = OrderForm(instance = order)
@@ -107,6 +114,7 @@ def updateOrder(request,pk):
     return render(request,'accounts/order_form.html',context)
 
 @login_required(login_url='login') 
+@allowed_users(allowed_roles=['admin'])
 def deleteOrder(request,pk):
     item = Order.objects.get(id=pk)
     if request.method =='POST':
@@ -116,8 +124,15 @@ def deleteOrder(request,pk):
     return render(request,'accounts/delete.html',context)
 
 @login_required(login_url='login') 
+@allowed_users(allowed_roles=['customer'])
 def userPage(request):
-    context={}
+    orders = request.user.customer.order_set.all()
+    # print('orders--->',orders)
+    total_orders = orders.count()
+    delivered = orders.filter(status='Delivered').count()
+    pending = orders.filter(status='Pending').count()
+    context={'orders':orders,'total_orders':total_orders,
+               'delivered':delivered,'pending':pending}
     return render(request,'accounts/user.html',context)
 
 '''
