@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-zr-3+=_!%@h%*b=n@ud@dr^7xrqp#&5u9e9n99%+j7b6-11rw^'
+SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -155,4 +155,9 @@ AWS_S3_FILE_OVERWRITE=False
 AWS_DEFAULT_ACL=None
 DEFAULT_FILE_STORAGE='storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'  
+import boto3
+from storages.backends.s3boto3 import S3Boto3Storage
+class MediaStorage(S3Boto3Storage):
+    location = 'images/'
 
+DEFAULT_FILE_STORAGE='crm.settings.MediaStorage'
