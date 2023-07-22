@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig',#installing our created app
     'django_filters',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -78,11 +80,11 @@ WSGI_APPLICATION = 'crm.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'DEMO_TEST',
-        'USER':'postgres',
-        'PASSWORD':'goelabhav2002',
-        'HOST':'localhost',
-        'PORT':'5432'
+        'NAME': config('DB_NAME'),
+        'USER':config('DB_USER'),
+        'PASSWORD':config('DB_PASS'),
+        'HOST':config('DB_HOST'),
+        'PORT':config('DB_PORT')
 
 
     }
@@ -140,5 +142,17 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'abhavpy@gmail.com'
-EMAIL_HOST_PASSWORD = 'rfqtzdfctzqedwai'
+EMAIL_HOST_USER = config('EMAIL')
+EMAIL_HOST_PASSWORD = config('EMAIL_PASS')
+
+#S3 bucket config
+# for media storage and static file serving
+AWS_ACCESS_KEY_ID=config('AWS_ACCESS_KEY')
+AWS_SECRET_ACCESS_KEY=config('AWS_SECRET_KEY')
+AWS_S3_REGION_NAME='ap-south-1'
+AWS_STORAGE_BUCKET_NAME=config('AWS_BUCKET_NAME')
+AWS_S3_FILE_OVERWRITE=False
+AWS_DEFAULT_ACL=None
+DEFAULT_FILE_STORAGE='storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'  
+
